@@ -15,3 +15,20 @@ and tmp2.month_last_day <= '2017-03-31'
 group by tmp2.customer_id, tmp2.year_num, tmp2.month_num                              
 order by customer_id, year_num, month_num
 limit 10;
+
+
+（別解）
+select c.customer_id, 
+  m.year_num, m.month_num, 
+  coalesce(sum(total_price), 0) as price_sum
+from customer_tb as c
+cross join month_mst as m
+left join reserve_tb as r
+on c.customer_id = r.customer_id
+  and r.reserve_datetime >= m.month_first_day
+  and r.reserve_datetime <= m.month_last_day
+where year_num = 2017
+  and month_num <= 3
+group by c.customer_id, m.year_num, m.month_num
+order by customer_id 
+limit 10;
